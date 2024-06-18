@@ -41,7 +41,7 @@ app.post('/notifications', async (req, res) => {
     }
 });
 
-const PORT = 4040;
+const PORT = 5040;
 app.listen(PORT, () => {
     console.log(`MongoDB Server is running on port ${PORT}`);
 });
