@@ -1,14 +1,16 @@
 import express from 'express';
-import dotenv from 'dotenv';
 import cors from 'cors';
 import http from 'http';
+import helmet from 'helmet';
 import orderRouter from './routes/order';
+import dotenv from 'dotenv'
 import notifRouter from './routes/notif'
 
 dotenv.config();
 
 const app = express();
 app.use(express.json());
+app.use(helmet());
 
 app.use(cors({
     origin: 'http://localhost:4000',
@@ -17,8 +19,7 @@ app.use(cors({
     credentials: true
 }));
 
-let port: number = parseInt(process.env.PORT || '5001', 10);
-
+let port: number = parseInt(process.env.BACKEND_MONGODB_PORT || '5001', 10);
 
 function createServer() {
     const server = http.createServer(app);
