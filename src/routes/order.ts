@@ -1,13 +1,12 @@
 import { Router } from 'express';
 import dotenv from 'dotenv'
+import { MongoClient } from 'mongodb';
 
 dotenv.config();
 
 const orderRouter = Router();
 
-const uri = process.env.URI_MONGODB;
-
-const { MongoClient } = require('mongodb');
+const uri = process.env.URI_MONGODB!;
 
 export interface Menu {
     id_menu: number;
@@ -49,7 +48,25 @@ orderRouter.post('/list', async (req: any, res: any) => {
 
         const commandesListe = await commandesCollection.find({ "customer.customer_id": customer_id }).toArray();
         res.json(commandesListe);
+    } catch (e) {
+        console.error('Error fetching commandes:', e);
+        res.status(500).json({ message: 'Internal Server Error' });
+    } finally {
+        await client.close();
+    }
+})
 
+orderRouter.get('/getOrders', async (req: any, res: any) => {
+    const uri = "mongodb+srv://admin:adminces'eat@ceseat.rkfov9n.mongodb.net/CES'EAT";
+    const client = new MongoClient(uri);
+    try {
+        await client.connect();
+
+        const database = client.db();
+        const commandesCollection = database.collection("Commandes");
+
+        const orders = await commandesCollection.find().toArray();
+        res.json(orders);
     } catch (e) {
         console.error('Error fetching commandes:', e);
         res.status(500).json({ message: 'Internal Server Error' });
@@ -94,6 +111,37 @@ orderRouter.post('/inprogress', async (req: any, res: any) => {
         }
     } catch (error) {
         console.error('Error connecting to database:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    } finally {
+        await client.close();
+    }
+})
+
+orderRouter.post('/assignDeliveryman', async (req: any, res: any) => {
+    const uri = "mongodb+srv://admin:adminces'eat@ceseat.rkfov9n.mongodb.net/CES'EAT";
+    const client = new MongoClient(uri);
+
+    try {
+        await client.connect();
+
+        const database = client.db();
+        const commandesCollection = database.collection("Commandes");
+
+        const { idOrder, idDriver, nameDriver, phoneDriver } = req.body;
+
+        await commandesCollection.updateOne(
+            { order_id: idOrder },
+            {
+                $set: {
+                    "driver.driver_id": idDriver,
+                    "driver.name": nameDriver,
+                    "driver.phone": phoneDriver,
+                }
+            }
+        )
+        res.status(200).json({ message: 'Assignation du livreur réussite' });
+    } catch (e) {
+        console.error('Error fetching commandes:', e);
         res.status(500).json({ message: 'Internal Server Error' });
     } finally {
         await client.close();
@@ -176,6 +224,32 @@ orderRouter.post('/creation', async (req: any, res: any) => {
         res.status(200).json({});
     } catch (e) {
         console.error('Error fetching command in delivery:', e);
+        res.status(500).json({ message: 'Internal Server Error' });
+    } finally {
+        await client.close();
+    }
+})
+
+orderRouter.post('/updateOrderStatus', async (req: any, res: any) => {
+    const uri = "mongodb+srv://admin:adminces'eat@ceseat.rkfov9n.mongodb.net/CES'EAT";
+    const client = new MongoClient(uri);
+    try {
+        await client.connect();
+        const database = client.db();
+        const commandesCollection = database.collection("Commandes");
+        const { idOrder, newStatus } = req.body;
+
+        await commandesCollection.updateOne(
+            { order_id: idOrder },
+            {
+                $set: {
+                    "order_status": newStatus,
+                }
+            }
+        )
+        res.status(200).json({ message: 'Mise à jour du status de la commande réussite' });
+    } catch (e) {
+        console.error('Error Update Error Status:', e);
         res.status(500).json({ message: 'Internal Server Error' });
     } finally {
         await client.close();

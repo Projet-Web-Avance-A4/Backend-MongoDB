@@ -3,8 +3,8 @@ import cors from 'cors';
 import http from 'http';
 import helmet from 'helmet';
 import orderRouter from './routes/order';
-
 import dotenv from 'dotenv'
+import notifRouter from './routes/notif'
 
 dotenv.config();
 
@@ -43,15 +43,16 @@ function createServer() {
     });
 }
 
-app.use('/order', orderRouter);
+    app.use('/order', orderRouter);
+    app.use('/notifications', notifRouter);
 
-app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-    console.error(err.stack);
-    res.status(500).send('Erreur côté serveur');
-});
+    app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+        console.error(err.stack);
+        res.status(500).send('Erreur côté serveur');
+    });
 
-app.use((req: express.Request, res: express.Response) => {
-    res.status(404).send('Impossible de trouver');
-});
+    app.use((req: express.Request, res: express.Response) => {
+        res.status(404).send('Impossible de trouver');
+    });
 
-createServer();
+    createServer();
