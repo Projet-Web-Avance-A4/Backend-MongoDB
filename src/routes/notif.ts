@@ -9,7 +9,8 @@ app.use(cors());
 app.use(express.json()); // Pour pouvoir lire les corps des requêtes JSON
 
 // Connexion MongoDB
-const mongoUrl = "mongodb+srv://admin:adminces'eat@ceseat.rkfov9n.mongodb.net/";
+/* const mongoUrl = "mongodb+srv://admin:adminces'eat@ceseat.rkfov9n.mongodb.net/"; */
+const mongoUrl = process.env.URI_MONGODB!;
 const dbName = "CES'EAT";
 let mongoClient;
 let notificationsCollection: any;

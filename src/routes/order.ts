@@ -164,7 +164,7 @@ orderRouter.post('/creation', async (req: any, res: any) => {
         }
     }
 
-    const response = await fetch('http://localhost:4000/client/getClient', {
+    const response = await fetch(`http://${process.env.DNS_APIGATEWAY}:4000/client/getClient`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
